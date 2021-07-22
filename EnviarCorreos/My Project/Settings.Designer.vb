@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("hp-hana:30015")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("192.168.10.10:30015")>  _
         Public Property Server() As String
             Get
                 Return CType(Me("Server"),String)
@@ -68,7 +68,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("hp-hana:40000")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("192.168.10.10:40000")>  _
         Public Property LicenseServer() As String
             Get
                 Return CType(Me("LicenseServer"),String)
@@ -92,7 +92,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Tekno2016")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Tekno2020.*")>  _
         Public Property DbPassword() As String
             Get
                 Return CType(Me("DbPassword"),String)
@@ -140,7 +140,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("C:\cfdi-hp\0010000104")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\192.168.10.12\cfdi-93\TME001205IQ5")>  _
         Public Property Ruta() As String
             Get
                 Return CType(Me("Ruta"),String)
@@ -152,7 +152,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("\\192.168.10.12\cfdi-hp\0010000104")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("\\192.168.10.12\cfdi-93\TME001205IQ5")>  _
         Public Property RutaSAP() As String
             Get
                 Return CType(Me("RutaSAP"),String)

@@ -3,16 +3,16 @@
   <Profiles />
   <Settings>
     <Setting Name="Server" Type="System.String" Scope="User">
-      <Value Profile="(Default)">hp-hana:30015</Value>
+      <Value Profile="(Default)">192.168.10.10:30015</Value>
     </Setting>
     <Setting Name="LicenseServer" Type="System.String" Scope="User">
-      <Value Profile="(Default)">hp-hana:40000</Value>
+      <Value Profile="(Default)">192.168.10.10:40000</Value>
     </Setting>
     <Setting Name="DbUserName" Type="System.String" Scope="User">
       <Value Profile="(Default)">SYSTEM</Value>
     </Setting>
     <Setting Name="DbPassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Tekno2016</Value>
+      <Value Profile="(Default)">Tekno2020.*</Value>
     </Setting>
     <Setting Name="CompanyDB" Type="System.String" Scope="User">
       <Value Profile="(Default)">TEKNOSTEP_PROD</Value>
@@ -24,10 +24,10 @@
       <Value Profile="(Default)">Tekno2015.</Value>
     </Setting>
     <Setting Name="Ruta" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\cfdi-hp\0010000104</Value>
+      <Value Profile="(Default)">\\192.168.10.12\cfdi-93\TME001205IQ5</Value>
     </Setting>
     <Setting Name="RutaSAP" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\192.168.10.12\cfdi-hp\0010000104</Value>
+      <Value Profile="(Default)">\\192.168.10.12\cfdi-93\TME001205IQ5</Value>
     </Setting>
   </Settings>
 </SettingsFile>

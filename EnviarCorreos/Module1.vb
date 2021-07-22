@@ -77,8 +77,6 @@ Module Module1
                     EmailC = oRecSettxb.Fields.Item("E_Mail").Value
                     Tipo = oRecSettxb.Fields.Item("Tipo").Value
 
-                    'ExportarPDF(DocEntry, ReportId, Tipo, DocDate, CardCode, DocNum)
-
                     ValidarDoc(DocEntry, ReportId, Tipo, DocDate, CardCode, DocNum, EmailC)
 
                     oRecSettxb.MoveNext()
@@ -98,75 +96,6 @@ Module Module1
 
     End Function
 
-    Public Function ExportarPDF(ByVal DocEntry As String, ByVal ReportId As String, ByVal Tipo As String, ByVal DocDate As Date, ByVal CardCode As String, ByVal DocNum As String)
-
-        'MsgBox("Consulta de Documentos exitosa")
-        Dim reportDocument As ReportDocument
-        Dim diskFileDestinationOption As DiskFileDestinationOptions
-
-        Try
-
-            reportDocument = New ReportDocument
-
-            If Tipo = "FC" Then
-
-                reportDocument.Load("C:\TareasProgramadas\EnvioCorreos\FC2.rpt")
-                'MsgBox("Carga de Documento Exitosa")
-
-            ElseIf Tipo = "NC" Then
-
-                reportDocument.Load("C:\TareasProgramadas\EnvioCorreos\NC2.rpt")
-
-            ElseIf Tipo = "PR" Then
-
-                reportDocument.Load("C:\TareasProgramadas\EnvioCorreos\PR2.rpt")
-
-            End If
-
-
-            Dim count As Integer = reportDocument.DataSourceConnections.Count
-            reportDocument.DataSourceConnections(0).SetLogon(My.Settings.DbUserName, My.Settings.DbPassword)
-
-            reportDocument.SetParameterValue(0, DocEntry)
-
-            reportDocument.ExportOptions.ExportDestinationType = ExportDestinationType.DiskFile
-            reportDocument.ExportOptions.ExportFormatType = ExportFormatType.PortableDocFormat
-            diskFileDestinationOption = New DiskFileDestinationOptions
-
-            If Tipo = "FC" Then
-
-                diskFileDestinationOption.DiskFileName = My.Settings.Ruta & "\" & DocDate.ToString("yyyy-MM") & "\" & CardCode & "\IN\" & ReportId & ".pdf"
-                'MsgBox("Asignacion de direccion Exitosa")
-
-            ElseIf Tipo = "NC" Then
-
-                diskFileDestinationOption.DiskFileName = My.Settings.Ruta & "\" & DocDate.ToString("yyyy-MM") & "\" & CardCode & "\CM\" & ReportId & ".pdf"
-
-            ElseIf Tipo = "PR" Then
-
-                diskFileDestinationOption.DiskFileName = My.Settings.Ruta & "\" & DocDate.ToString("yyyy-MM") & "\" & CardCode & "\RC\" & ReportId & ".pdf"
-
-            End If
-
-            reportDocument.ExportOptions.ExportDestinationOptions = diskFileDestinationOption
-            reportDocument.ExportOptions.ExportFormatOptions = New PdfRtfWordFormatOptions
-
-            reportDocument.Export()
-            'MsgBox("Exportacion de Documento Exitosa")
-            reportDocument.Close()
-            reportDocument.Dispose()
-            GC.SuppressFinalize(reportDocument)
-
-        Catch ex As Exception
-
-            Dim stError As String
-            stError = "Error en ExportarPDF. " & ex.Message
-            Setlog(stError, DocNum, " ", " ", CardCode, Tipo)
-            'MsgBox(stError)
-
-        End Try
-
-    End Function
 
     Public Function ValidarDoc(ByVal DocEntry As String, ByVal ReportID As String, ByVal Tipo As String, ByVal DocDate As Date, ByVal CardCode As String, ByVal DocNum As String, ByVal EmailC As String)
 
@@ -222,6 +151,7 @@ Module Module1
 
                 If EmailC <> "" Then
 
+                    UpdatePDFXML(DocNum, pdfSAP, xmlSAP, Tipo)
                     EnviarCorreo(DocNum, EmailC, pdf, xml, Tipo, pdfSAP, xmlSAP, CardCode)
 
                 Else
@@ -232,21 +162,9 @@ Module Module1
 
                 End If
 
-            ElseIf FileQuery.Count = 0 Then
+            ElseIf FileQuery.Count = 0 And fileQuery1.Count > 0 Then
 
-                ExportarPDF(DocEntry, ReportID, Tipo, DocDate, CardCode, DocNum)
-
-                'Dim stError As String
-                'If Tipo = "FC" Then
-                '    stError = "A la factura no se le ha creado un pdf"
-                '    Setlog(stError, DocNum, EmailC, " ", CardCode, Tipo)
-                'ElseIf Tipo = "NC" Then
-                '    stError = "A la nota de credito no se le ha creado un pdf"
-                '    Setlog(stError, DocNum, EmailC, " ", CardCode, Tipo)
-                'ElseIf Tipo = "PR" Then
-                '    stError = "Al pago recibido no se le ha creado un pdf"
-                '    Setlog(stError, DocNum, EmailC, " ", CardCode, Tipo)
-                'End If
+                ExportarPDF(DocEntry, ReportID, Tipo, DocDate, CardCode, DocNum, EmailC)
 
             ElseIf fileQuery1.Count = 0 Then
 
@@ -275,19 +193,157 @@ Module Module1
 
     End Function
 
+
+    Public Function ExportarPDF(ByVal DocEntry As String, ByVal ReportId As String, ByVal Tipo As String, ByVal DocDate As Date, ByVal CardCode As String, ByVal DocNum As String, ByVal EmailC As String)
+
+        'MsgBox("Consulta de Documentos exitosa")
+        Dim reportDocument As ReportDocument
+        Dim diskFileDestinationOption As DiskFileDestinationOptions
+
+
+        Try
+
+            reportDocument = New ReportDocument
+
+            If Tipo = "FC" Then
+
+                reportDocument.Load("C:\TareasProgramadas\EnvioCorreos\FC2.rpt")
+                'MsgBox("Carga de Documento Exitosa")
+
+            ElseIf Tipo = "NC" Then
+
+                reportDocument.Load("C:\TareasProgramadas\EnvioCorreos\NC2.rpt")
+
+            ElseIf Tipo = "PR" Then
+
+                reportDocument.Load("C:\TareasProgramadas\EnvioCorreos\PR2.rpt")
+
+            End If
+
+
+            Dim count As Integer = reportDocument.DataSourceConnections.Count
+            reportDocument.DataSourceConnections(0).SetLogon(My.Settings.DbUserName, My.Settings.DbPassword)
+
+            reportDocument.SetParameterValue(0, DocEntry)
+
+            reportDocument.ExportOptions.ExportDestinationType = ExportDestinationType.DiskFile
+            reportDocument.ExportOptions.ExportFormatType = ExportFormatType.PortableDocFormat
+            diskFileDestinationOption = New DiskFileDestinationOptions
+
+            If Tipo = "FC" Then
+
+                diskFileDestinationOption.DiskFileName = My.Settings.Ruta & "\" & DocDate.ToString("yyyy-MM") & "\" & CardCode & "\IN\" & ReportId & ".pdf"
+                'MsgBox("Asignacion de direccion Exitosa")
+
+            ElseIf Tipo = "NC" Then
+
+                diskFileDestinationOption.DiskFileName = My.Settings.Ruta & "\" & DocDate.ToString("yyyy-MM") & "\" & CardCode & "\CM\" & ReportId & ".pdf"
+
+            ElseIf Tipo = "PR" Then
+
+                diskFileDestinationOption.DiskFileName = My.Settings.Ruta & "\" & DocDate.ToString("yyyy-MM") & "\" & CardCode & "\RC\" & ReportId & ".pdf"
+
+            End If
+
+            reportDocument.ExportOptions.ExportDestinationOptions = diskFileDestinationOption
+            reportDocument.ExportOptions.ExportFormatOptions = New PdfRtfWordFormatOptions
+
+            reportDocument.Export()
+            'MsgBox("Exportacion de Documento Exitosa")
+            reportDocument.Close()
+            reportDocument.Dispose()
+            GC.SuppressFinalize(reportDocument)
+
+            UpdatePDFXML(DocNum, pdfSAP, xmlSAP, Tipo)
+
+            If EmailC <> "" Then
+
+                EnviarCorreo(DocNum, EmailC, pdf, xml, Tipo, pdfSAP, xmlSAP, CardCode)
+
+            Else
+
+                Dim stError As String
+                stError = "El socio de negocios no tiene asignado un correo electronico"
+                Setlog(stError, DocNum, EmailC, " ", CardCode, Tipo)
+
+            End If
+
+        Catch ex As Exception
+
+            Dim stError As String
+            stError = "Error en ExportarPDF. " & ex.Message
+            Setlog(stError, DocNum, " ", " ", CardCode, Tipo)
+            'MsgBox(stError)
+
+        End Try
+
+    End Function
+
+
+    Public Function UpdatePDFXML(ByVal DocNum As String, ByVal pdfSAP As String, ByVal xmlSAP As String, ByVal Tipo As String)
+
+        Dim oRecSettxb1, oRecSettxb2 As SAPbobsCOM.Recordset
+        Dim stQuerytxb1, stQuerytxb2 As String
+
+        Try
+
+            If Tipo = "FC" Then
+
+                oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb1 = "Update OINV set ""U_XML""='" & xmlSAP & "' where ""DocNum""=" & DocNum
+                oRecSettxb1.DoQuery(stQuerytxb1)
+
+                oRecSettxb2 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb2 = "Update OINV set ""U_PDF""='" & pdfSAP & "' where ""DocNum""=" & DocNum
+                oRecSettxb2.DoQuery(stQuerytxb2)
+
+            ElseIf Tipo = "NC" Then
+
+                oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb1 = "Update ORIN set ""U_XML""='" & xmlSAP & "' where ""DocNum""=" & DocNum
+                oRecSettxb1.DoQuery(stQuerytxb1)
+
+                oRecSettxb2 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb2 = "Update ORIN set ""U_PDF""='" & pdfSAP & "' where ""DocNum""=" & DocNum
+                oRecSettxb2.DoQuery(stQuerytxb2)
+
+            ElseIf Tipo = "PR" Then
+
+                oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb1 = "Update ORCT set ""U_XML""='" & xmlSAP & "' where ""DocNum""=" & DocNum
+                oRecSettxb1.DoQuery(stQuerytxb1)
+
+                oRecSettxb2 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb2 = "Update ORCT set ""U_PDF""='" & pdfSAP & "' where ""DocNum""=" & DocNum
+                oRecSettxb2.DoQuery(stQuerytxb2)
+
+            End If
+
+        Catch ex As Exception
+
+            Dim stError As String
+            stError = "Error en UpdatePDFXML. " & ex.Message
+            Setlog(stError, DocNum, " ", " ", "", Tipo)
+            'MsgBox(stError)
+
+        End Try
+
+    End Function
+
+
     Public Function EnviarCorreo(ByVal DocNum As String, ByVal EmailC As String, ByVal pdf As String, ByVal xml As String, ByVal Tipo As String, ByVal pdfSAP As String, ByVal xmlSAP As String, ByVal CardCode As String)
 
         'MsgBox("Validacion de Documentos exitosa")
         Dim message As New MailMessage
         Dim smtp As New SmtpClient
-        Dim oRecSettxb, oRecSettxb1, oRecSettxb2 As SAPbobsCOM.Recordset
-        Dim stQuerytxb, stQuerytxb1, stQuerytxb2 As String
+        Dim oRecSettxb As SAPbobsCOM.Recordset
+        Dim stQuerytxb As String
         Dim EmailU, Pass, EmailCC, Subject, Body, smtpService, Puerto, SegSSL As String
 
         Try
 
             oRecSettxb = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            stQuerytxb = "Select ""U_Email"",""U_Password"",""U_EmailCC"",""U_Subject"",""U_Body"",""U_SMTP"",""U_Puerto"",""U_SeguridadSSL"" from ""@CORREOTEKNO"""
+            stQuerytxb = "Select ""U_Email"",""U_Password"",""U_EmailCC"",""U_Subject"",""U_Body"",""U_SMTP"",""U_Puerto"",""U_SeguridadSSL"" from ""@CORREOTEKNO"" where ""Name""='Automático'"
             oRecSettxb.DoQuery(stQuerytxb)
 
             If oRecSettxb.RecordCount > 0 Then
@@ -344,37 +400,7 @@ Module Module1
                 'Enviamos Correo
                 smtp.Send(message)
 
-                If Tipo = "FC" Then
-
-                    oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    stQuerytxb1 = "Update OINV set ""U_XML""='" & xmlSAP & "' where ""DocNum""=" & DocNum
-                    oRecSettxb1.DoQuery(stQuerytxb1)
-
-                    oRecSettxb2 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    stQuerytxb2 = "Update OINV set ""U_PDF""='" & pdfSAP & "' where ""DocNum""=" & DocNum
-                    oRecSettxb2.DoQuery(stQuerytxb2)
-
-                ElseIf Tipo = "NC" Then
-
-                    oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    stQuerytxb1 = "Update ORIN set ""U_XML""='" & xmlSAP & "' where ""DocNum""=" & DocNum
-                    oRecSettxb1.DoQuery(stQuerytxb1)
-
-                    oRecSettxb2 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    stQuerytxb2 = "Update ORIN set ""U_PDF""='" & pdfSAP & "' where ""DocNum""=" & DocNum
-                    oRecSettxb2.DoQuery(stQuerytxb2)
-
-                ElseIf Tipo = "PR" Then
-
-                    oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    stQuerytxb1 = "Update ORCT set ""U_XML""='" & xmlSAP & "' where ""DocNum""=" & DocNum
-                    oRecSettxb1.DoQuery(stQuerytxb1)
-
-                    oRecSettxb2 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    stQuerytxb2 = "Update ORCT set ""U_PDF""='" & pdfSAP & "' where ""DocNum""=" & DocNum
-                    oRecSettxb2.DoQuery(stQuerytxb2)
-
-                End If
+                UpdateCorreoEnviado(DocNum, Tipo)
 
             End If
 
@@ -388,6 +414,44 @@ Module Module1
         End Try
 
     End Function
+
+
+    Public Function UpdateCorreoEnviado(ByVal DocNum As String, ByVal Tipo As String)
+
+        Dim oRecSettxb1 As SAPbobsCOM.Recordset
+        Dim stQuerytxb1 As String
+
+        Try
+
+            oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            stQuerytxb1 = "Update OINV set ""U_TekEnviado""='Y' where ""DocNum""=" & DocNum
+            oRecSettxb1.DoQuery(stQuerytxb1)
+
+            If Tipo = "FC" Then
+
+                oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb1 = "Update OINV set ""U_TekEnviado""='Y' where ""DocNum""=" & DocNum
+                oRecSettxb1.DoQuery(stQuerytxb1)
+
+            ElseIf Tipo = "NC" Then
+
+                oRecSettxb1 = SBOCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                stQuerytxb1 = "Update ORIN set ""U_TekEnviado""='Y' where ""DocNum""=" & DocNum
+                oRecSettxb1.DoQuery(stQuerytxb1)
+
+            End If
+
+        Catch ex As Exception
+
+            Dim stError As String
+            stError = "Error en UpdatePDFXML. " & ex.Message
+            Setlog(stError, DocNum, " ", " ", "", Tipo)
+            'MsgBox(stError)
+
+        End Try
+
+    End Function
+
 
     Public Function Setlog(ByVal stError As String, ByVal DocNum As String, ByVal EmailC As String, ByVal EmailU As String, ByVal CardCode As String, ByVal Tipo As String)
 
